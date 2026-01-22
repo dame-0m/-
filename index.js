@@ -1,3 +1,14 @@
+const http = require("http");
+
+const PORT = process.env.PORT || 3000;
+
+http.createServer((req, res) => {
+  res.writeHead(200, { "Content-Type": "text/plain" });
+  res.end("Bot is running");
+}).listen(PORT, () => {
+  console.log(`HTTP server listening on port ${PORT}`);
+});
+
 const {
   Client,
   GatewayIntentBits,
@@ -62,10 +73,20 @@ client.once("ready", async () => {
         .setStyle(ButtonStyle.Success)
     );
 
-    await embedChannel.send({
-      embeds: [embed],
-      components: [buttonRow]
-    });
+    const messages = await embedChannel.messages.fetch({ limit: 10 });
+
+    const alreadySent = messages.some(msg =>
+      msg.author.id === client.user.id &&
+      msg.embeds.length > 0 &&
+      msg.embeds[0].title?.includes("ว่างวันไหนกันบ้างงับ")
+    );
+
+    if (!alreadySent) {
+      await embedChannel.send({
+        embeds: [embed],
+        components: [buttonRow]
+      });
+    }
 
     console.log(`ส่ง Embed สำเร็จที่เซิร์ฟ: ${guild.name}`);
   }
