@@ -9,11 +9,8 @@ const {
 } = require("discord.js");
 
 const TOKEN = process.env.TOKEN;
-
-const EMBED_CHANNEL_NAME = "ทั่วไป";
-const DATA_CHANNEL_NAME = "ข้อมูลการเลือกวันว่าง";
-
-// เก็บข้อมูลชั่วคราว แยกตาม user
+const EMBED_CHANNEL_NAME = "นัดลงดัน";
+const DATA_CHANNEL_NAME = "รายชื่อนัดลงดัน";
 const userSelections = new Map();
 
 const client = new Client({
@@ -31,7 +28,7 @@ client.once("ready", async () => {
   );
 
   if (!embedChannel) {
-    console.log("ไม่พบห้อง 'ทั่วไป'");
+    console.log("ไม่พบห้อง 'นัดลงดัน'");
     return;
   }
 
@@ -56,10 +53,6 @@ client.once("ready", async () => {
 });
 
 client.on("interactionCreate", async interaction => {
-
-  /* ===============================
-     กดปุ่มเริ่มเลือกวัน
-     =============================== */
   if (interaction.isButton() && interaction.customId === "start_select") {
     await interaction.deferReply({ ephemeral: true });
 
@@ -84,10 +77,6 @@ client.on("interactionCreate", async interaction => {
       components: [dayMenu]
     });
   }
-
-  /* ===============================
-     เลือกวัน
-     =============================== */
   if (interaction.isStringSelectMenu() && interaction.customId === "select_days") {
     await interaction.deferReply({ ephemeral: true });
 
@@ -113,10 +102,6 @@ client.on("interactionCreate", async interaction => {
       components: [timeMenu]
     });
   }
-
-  /* ===============================
-     เลือกเวลา + ส่งข้อมูล
-     =============================== */
   if (interaction.isStringSelectMenu() && interaction.customId === "select_times") {
     await interaction.deferReply({ ephemeral: true });
 
@@ -133,7 +118,7 @@ client.on("interactionCreate", async interaction => {
 
     if (!dataChannel) {
       return interaction.editReply({
-        content: "ไม่พบห้อง 'ข้อมูลการเลือกวันว่าง'"
+        content: "ไม่พบห้อง 'รายชื่อนัดลงดัน'"
       });
     }
 
@@ -156,3 +141,4 @@ client.on("interactionCreate", async interaction => {
 });
 
 client.login(TOKEN);
+
