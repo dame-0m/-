@@ -91,9 +91,8 @@ client.on("interactionCreate", async interaction => {
         .setMinValues(1)
         .setMaxValues(3)
         .addOptions([
-          { label: "09:00 - 12:00", value: "09:00 - 12:00" },
-          { label: "13:00 - 17:00", value: "13:00 - 17:00" },
-          { label: "19:00 - 22:00", value: "19:00 - 22:00" }
+          { label: "18:00 - 21:00", value: "18:00 - 21:00" },
+          { label: "21:00 - 01:00", value: "21:00 - 01:00" }
         ])
     );
 
@@ -141,4 +140,5 @@ client.on("interactionCreate", async interaction => {
 });
 
 client.login(TOKEN);
+
 
