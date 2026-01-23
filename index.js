@@ -2,12 +2,14 @@ const http = require("http");
 
 const PORT = process.env.PORT || 3000;
 
-http.createServer((req, res) => {
-  res.writeHead(200, { "Content-Type": "text/plain" });
-  res.end("Bot is running");
-}).listen(PORT, () => {
-  console.log(`HTTP server listening on port ${PORT}`);
-});
+http
+  .createServer((req, res) => {
+    res.writeHead(200, { "Content-Type": "text/plain" });
+    res.end("Bot is running");
+  })
+  .listen(PORT, () => {
+    console.log(`Web server running on port ${PORT}`);
+  });
 
 const {
   Client,
@@ -16,7 +18,7 @@ const {
   ButtonBuilder,
   ButtonStyle,
   EmbedBuilder,
-  StringSelectMenuBuilder
+  StringSelectMenuBuilder,
 } = require("discord.js");
 
 const TOKEN = process.env.TOKEN;
@@ -30,7 +32,7 @@ const DAY_ORDER = [
   "wednesday",
   "thursday",
   "friday",
-  "saturday"
+  "saturday",
 ];
 
 const DAY_TH = {
@@ -39,21 +41,19 @@ const DAY_TH = {
   wednesday: "พุธ",
   thursday: "พฤหัส",
   friday: "ศุกร์",
-  saturday: "เสาร์"
+  saturday: "เสาร์",
 };
 
-
 const client = new Client({
-  intents: [GatewayIntentBits.Guilds]
+  intents: [GatewayIntentBits.Guilds],
 });
 
 client.once("ready", async () => {
   console.log("Bot Online");
 
   for (const guild of client.guilds.cache.values()) {
-
     const embedChannel = guild.channels.cache.find(
-      ch => ch.name === EMBED_CHANNEL_NAME
+      (ch) => ch.name === EMBED_CHANNEL_NAME,
     );
 
     if (!embedChannel) {
@@ -62,7 +62,9 @@ client.once("ready", async () => {
     }
 
     const embed = new EmbedBuilder()
-      .setTitle("<a:22709sword10929m:1446934116455944222>ว่างวันไหนกันบ้างงับ จะได้ไปลงดันกัน<a:22709sword10929m:1446934116455944222>")
+      .setTitle(
+        "<a:22709sword10929m:1446934116455944222>ว่างวันไหนกันบ้างงับ จะได้ไปลงดันกัน<a:22709sword10929m:1446934116455944222>",
+      )
       .setDescription("กดปุ่มด้านล่างเพื่อเลือกวันและช่วงเวลาที่ว่างได้เลย")
       .setColor(0x00bfff);
 
@@ -70,21 +72,22 @@ client.once("ready", async () => {
       new ButtonBuilder()
         .setCustomId("start_select")
         .setLabel("ปุ่มๆๆๆ")
-        .setStyle(ButtonStyle.Success)
+        .setStyle(ButtonStyle.Success),
     );
 
     const messages = await embedChannel.messages.fetch({ limit: 10 });
 
-    const alreadySent = messages.some(msg =>
-      msg.author.id === client.user.id &&
-      msg.embeds.length > 0 &&
-      msg.embeds[0].title?.includes("ว่างวันไหนกันบ้างงับ")
+    const alreadySent = messages.some(
+      (msg) =>
+        msg.author.id === client.user.id &&
+        msg.embeds.length > 0 &&
+        msg.embeds[0].title?.includes("ว่างวันไหนกันบ้างงับ"),
     );
 
     if (!alreadySent) {
       await embedChannel.send({
         embeds: [embed],
-        components: [buttonRow]
+        components: [buttonRow],
       });
     }
 
@@ -92,8 +95,7 @@ client.once("ready", async () => {
   }
 });
 
-
-client.on("interactionCreate", async interaction => {
+client.on("interactionCreate", async (interaction) => {
   if (interaction.isButton() && interaction.customId === "start_select") {
     await interaction.deferReply({ ephemeral: true });
 
@@ -109,20 +111,23 @@ client.on("interactionCreate", async interaction => {
           { label: "พุธ", value: "wednesday" },
           { label: "พฤหัส", value: "thursday" },
           { label: "ศุกร์", value: "friday" },
-          { label: "เสาร์", value: "saturday" }
-        ])
+          { label: "เสาร์", value: "saturday" },
+        ]),
     );
 
     await interaction.editReply({
       content: "ว่างวันไหนบ้าง(เลือกได้หลายวันนะ)",
-      components: [dayMenu]
+      components: [dayMenu],
     });
   }
-  if (interaction.isStringSelectMenu() && interaction.customId === "select_days") {
+  if (
+    interaction.isStringSelectMenu() &&
+    interaction.customId === "select_days"
+  ) {
     await interaction.deferReply({ ephemeral: true });
 
     userSelections.set(interaction.user.id, {
-      days: interaction.values
+      days: interaction.values,
     });
 
     const timeMenu = new ActionRowBuilder().addComponents(
@@ -133,43 +138,46 @@ client.on("interactionCreate", async interaction => {
         .setMaxValues(2)
         .addOptions([
           { label: "18:00 - 21:00", value: "18:00 - 21:00" },
-          { label: "21:00 - 01:00", value: "21:00 - 01:00" }
-        ])
+          { label: "21:00 - 01:00", value: "21:00 - 01:00" },
+        ]),
     );
 
     await interaction.editReply({
       content: "ว่างเวลาไหนบ้าง",
-      components: [timeMenu]
+      components: [timeMenu],
     });
   }
-  if (interaction.isStringSelectMenu() && interaction.customId === "select_times") {
+  if (
+    interaction.isStringSelectMenu() &&
+    interaction.customId === "select_times"
+  ) {
     await interaction.deferReply({ ephemeral: true });
 
     const data = userSelections.get(interaction.user.id);
     if (!data) {
       return interaction.editReply({
-        content: "ไม่พบข้อมูลการเลือกวัน กรุณาเริ่มใหม่"
-    });
+        content: "ไม่พบข้อมูลการเลือกวัน กรุณาเริ่มใหม่",
+      });
     }
 
-/* เรียงวัน */
+    /* เรียงวัน */
     const sortedDays = data.days
       .sort((a, b) => DAY_ORDER.indexOf(a) - DAY_ORDER.indexOf(b))
-      .map(day => DAY_TH[day]);
+      .map((day) => DAY_TH[day]);
 
-/* เรียงเวลา */
+    /* เรียงเวลา */
     const sortedTimes = interaction.values.sort((a, b) => {
-      const getHour = t => parseInt(t.split(":")[0]);
+      const getHour = (t) => parseInt(t.split(":")[0]);
       return getHour(a) - getHour(b);
     });
 
     const dataChannel = interaction.guild.channels.cache.find(
-      ch => ch.name === DATA_CHANNEL_NAME
+      (ch) => ch.name === DATA_CHANNEL_NAME,
     );
 
     if (!dataChannel) {
       return interaction.editReply({
-        content: "ไม่พบห้อง 'รายชื่อนัดลงดัน'"
+        content: "ไม่พบห้อง 'รายชื่อนัดลงดัน'",
       });
     }
 
@@ -177,19 +185,18 @@ client.on("interactionCreate", async interaction => {
     const serverName = interaction.member.displayName;
 
     await dataChannel.send(
-      `ชื่อ : **${username} (${serverName})**\n` +
-      `วันที่ว่าง : ${sortedDays.join(", ")}\n` +
-      `เวลา : ${sortedTimes.join(", ")}`
+      `ชื่อ : **\`\`${username} (${serverName})\`\`**\n` +
+        `วันที่ว่าง : ${sortedDays.join(", ")}\n` +
+        `เวลา : ${sortedTimes.join(", ")}`,
     );
 
     userSelections.delete(interaction.user.id);
 
     await interaction.editReply({
       content: "เรียบร้อยงับ กดปิดข้อความได้เลย",
-      components: []
+      components: [],
     });
   }
 });
 
 client.login(TOKEN);
-
